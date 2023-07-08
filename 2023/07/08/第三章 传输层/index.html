@@ -1,0 +1,305 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第三章 传输层 | 无糖气泡水的博客</title><meta name="author" content="见录"><meta name="copyright" content="见录"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="第三章 传输层端到端 报文 （进程之间面向通信的最高层，服务于应用层 1.多路复用 2.tcp&#x2F;udp 3.流量控制 4.拥塞控制 3.1多路复用与分解利用同个接口 发送方(多路复用，接收方（多路分解 如何区分不同的数据来源？—&gt;ip地址  UDP：具有不同的源IP地址且或源端口号,但具有相同的目的IP地址和目的端口号的IP数据报，指向同样的套接字  （主要是目的端口号 目的ip">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第三章 传输层">
+<meta property="og:url" content="http://example.com/2023/07/08/%E7%AC%AC%E4%B8%89%E7%AB%A0%20%E4%BC%A0%E8%BE%93%E5%B1%82/index.html">
+<meta property="og:site_name" content="无糖气泡水的博客">
+<meta property="og:description" content="第三章 传输层端到端 报文 （进程之间面向通信的最高层，服务于应用层 1.多路复用 2.tcp&#x2F;udp 3.流量控制 4.拥塞控制 3.1多路复用与分解利用同个接口 发送方(多路复用，接收方（多路分解 如何区分不同的数据来源？—&gt;ip地址  UDP：具有不同的源IP地址且或源端口号,但具有相同的目的IP地址和目的端口号的IP数据报，指向同样的套接字  （主要是目的端口号 目的ip">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/avatar.jpg">
+<meta property="article:published_time" content="2023-07-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-07-08T15:55:33.383Z">
+<meta property="article:author" content="见录">
+<meta property="article:tag" content="计网">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/avatar.jpg"><link rel="shortcut icon" href="/img/logo.png"><link rel="canonical" href="http://example.com/2023/07/08/%E7%AC%AC%E4%B8%89%E7%AB%A0%20%E4%BC%A0%E8%BE%93%E5%B1%82/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第三章 传输层',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-07-08 23:55:33'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">7</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">1</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url('/img/back.png')"><nav id="nav"><span id="blog-info"><a href="/" title="无糖气泡水的博客"><img class="site-icon" src="/img/logo.png"/><span class="site-name">无糖气泡水的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">第三章 传输层</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-07-07T16:00:00.000Z" title="发表于 2023-07-08 00:00:00">2023-07-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-07-08T15:55:33.383Z" title="更新于 2023-07-08 23:55:33">2023-07-08</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%A1%E7%BD%91/">计网</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%A1%E7%BD%91/%E4%BC%A0%E8%BE%93%E5%B1%82/">传输层</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="第三章 传输层"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="第三章-传输层"><a href="#第三章-传输层" class="headerlink" title="第三章 传输层"></a>第三章 传输层</h1><h4 id="端到端-报文-（进程之间"><a href="#端到端-报文-（进程之间" class="headerlink" title="端到端 报文 （进程之间"></a>端到端 报文 （进程之间</h4><p>面向通信的最高层，服务于应用层</p>
+<p>1.多路复用</p>
+<p>2.tcp&#x2F;udp</p>
+<p>3.流量控制</p>
+<p>4.拥塞控制</p>
+<h3 id="3-1多路复用与分解"><a href="#3-1多路复用与分解" class="headerlink" title="3.1多路复用与分解"></a>3.1多路复用与分解</h3><p>利用同个接口 发送方(多路复用，接收方（多路分解</p>
+<p>如何区分不同的数据来源？—&gt;ip地址</p>
+<ul>
+<li>UDP：具有不同的源IP地址且或源端口号,但具有相同的目的IP地址和目的端口号的IP数据报，指向<u>同样</u>的套接字</li>
+</ul>
+<p>（主要是目的端口号 目的ip</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687487457209.png" alt="1687487457209"></p>
+<ul>
+<li>TCP套接字：由四个部分  <u>源IP地址  源端口号  目的IP地址   目的端口号</u></li>
+</ul>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687487472645.png" alt="1687487472645"></p>
+<h3 id="3-2-UDP（user-data-protocol"><a href="#3-2-UDP（user-data-protocol" class="headerlink" title="3.2 UDP（user data protocol"></a>3.2 UDP（user data protocol</h3><p>面向报文的传输层协议<img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1684745711684.png" alt="1684745711684"></p>
+<p>没有拥塞控制和流量控制，适合很多多媒体领域</p>
+<p>面向报文，应用层发多少，UDP添加头部后直接发送，保留原有边界</p>
+<p>UDP 只在 IP 的数据报服务之上增加了端口的功能和差错检测的功能。</p>
+<ul>
+<li><p>在计算校验和的时候临时把’伪首部’和首部连接</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687488534115.png" alt="1687488534115"></p>
+</li>
+</ul>
+<p><u>Internet校验和：</u>将数据段看成16bit的整数序列校验和， 数据段内容相加 (1的补码和，即反码)，发送者将校验和值放入UDP的校验和域</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687488655660.png" alt="1687488655660"></p>
+<h3 id="3-3-可靠数据传输原理"><a href="#3-3-可靠数据传输原理" class="headerlink" title="3.3 可靠数据传输原理"></a>3.3 可靠数据传输原理</h3><p><code>FSM</code>:有限状态机   <code>rdt</code>：可靠传输协议</p>
+<ul>
+<li><p>rdt 1.0 完全可靠的信道</p>
+<p>无bit错误，无分组丢失；接收方、发送方分离的fsm</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687489061389.png" alt="1687489061389"></p>
+</li>
+<li><p>Rdt2.0: 具有bit错误的信道</p>
+<p>出现bit错误:比1.0多了差错检测，接收方反馈（ack,nak</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687489352292.png" alt="1687489352292"></p>
+<p><code>停等协议</code>：发送一个报文，然后等待报文的返回信息再发送</p>
+<p>rdt2.0致命错误：ACK和NAK出现混淆时-》方法：重发，添加序号</p>
+</li>
+<li><p>rdt2.1: 处理混乱的 ACK&#x2F;NAKs</p>
+<p>因为是停等协议，所以只有两个序号0，1</p>
+<ul>
+<li><p>发送方处理混乱的 ACK&#x2F;NAKs</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687489931869.png" alt="1687489931869"></p>
+<p>此时只要收到一个被损坏的corrupt还是收到NAK，都重发，so采用<code>||</code></p>
+</li>
+<li><p>接收方处理混乱的 ACK&#x2F;NAKs</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687490337266.png" alt="1687490337266"></p>
+<p>注意：当收到一个错位的数据报，此时的也是继续等待的fsm，但发ack</p>
+<p>接收方并不知道它的上一个ACK&#x2F;NAK 是否被发送方正确收到</p>
+</li>
+</ul>
+</li>
+<li><p>rdt2.2: 一个不要NAK的协议</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687490590456.png" alt="1687490590456"></p>
+<p>不用 NAK, 如果上个报文接收正确接收方发送 ACK<br> 接收方必须明确包含被确认的报文的序号</p>
+</li>
+<li><p>rdt3.0: 具有出错和丢失的信道</p>
+<p>假设: 下层信道还要丢失报文 (数据或者 ACKs)<br>校验和, 序号, 确认, 重发将会有帮助，但是不够</p>
+<p>方法: 发送者等待“合理的”确认时间</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687490986659.png" alt="1687490986659"></p>
+<p>注意：如果收到损坏的或者序号错误的，字节不进行操作，超时会重发</p>
+<img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687491103618.png" alt="1687491103618" style="zoom:50%;" />
+
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687491118486.png" alt="1687491118486"></p>
+<p>RDT3.0的利用率：<img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687491271350.png" alt="1687491271350" style="zoom: 33%;" /></p>
+<p>可知：3.0能用但是效率不高，停等协议限制了资源的利用</p>
+</li>
+<li><p><strong>流水线技术</strong></p>
+<ul>
+<li><p>go-Back-N</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687491542180.png" alt="1687491542180"></p>
+<p>接受方：</p>
+<p>总是给接受的最高序号好丧ACK，可能出现重复，但只要记住exceptnum</p>
+<p>收到失序的，字节丢掉，重发最高序号ack</p>
+</li>
+<li><p>选择性重传(Selective Repeat, SR)</p>
+<p>对每个没有确认的报文发送者都要启动一个定时器(每个未被确认的报文都有一个定时器)</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687491729333.png" alt="1687491729333"></p>
+<p>此时接收方</p>
+<p>具有缓存，缓存失序order的数据报。缓存！！</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687500794973.png" alt="1687500794973"></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-4-面向连接的服务-TCP"><a href="#3-4-面向连接的服务-TCP" class="headerlink" title="3.4 面向连接的服务 TCP"></a>3.4 面向连接的服务 TCP</h3><p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687501056240.png" alt="1687501056240"></p>
+<p>对应字段的信息见书上。固定20个字节长度</p>
+<p><u><em>序号和确认号</em>：</u></p>
+<p>序号是发送的数据段在数据流的编号，确认号是期望从对方收到的编号</p>
+<p>但收到失序的数据段，TCP没规定，一般编程人员自己处理</p>
+<p><strong>可靠传输机制</strong></p>
+<p>流水线技术、累计确认、触发重发（超时时间、重复确认</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687501581054.png" alt="1687501581054"></p>
+<p>注意：很像SR（重传技术，但是采用累计ack技术</p>
+<img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687501798132.png" alt="1687501798132" style="zoom:50%;" />
+
+<p>采用<code>快速重传</code>技术：收到三个重复的ack，在超时之前重发丢失的报文段</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687501908886.png" alt="1687501908886"></p>
+<ul>
+<li><p>流量控制</p>
+<p>在接收方返回的时候，报文段宣告此时的接收窗口剩余空间</p>
+</li>
+<li><p>连接管理</p>
+<p>三次握手、四次挥手</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687502266431.png" alt="1687502266431"></p>
+</li>
+</ul>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687502319763.png" alt="1687502319763"></p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687502457108.png" alt="1687502457108"></p>
+<img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687502533358.png" alt="1687502533358" style="zoom:50%;" />
+
+<h3 id="3-5-拥塞控制原理"><a href="#3-5-拥塞控制原理" class="headerlink" title="3.5 拥塞控制原理"></a>3.5 拥塞控制原理</h3><p>和流量控制不同，表现在丢失分组、长延迟</p>
+<p><img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687503775761.png" alt="1687503775761"></p>
+<p>超时重发但并未丢失等情况会浪费路由器的发送能力</p>
+<h3 id="3-6-TCP拥塞控制！！"><a href="#3-6-TCP拥塞控制！！" class="headerlink" title="3.6 TCP拥塞控制！！"></a>3.6 TCP拥塞控制！！</h3><p>三个机制：慢启动、AIMD、对拥塞事件做出的反应</p>
+<ul>
+<li>慢启动：初始为1，2的倍数增长</li>
+<li>AIMD:发送方增加窗口大小，探测可用带宽，直至发生丢包事件</li>
+</ul>
+<p>​            乘性减：发生丢包字节窗口&#x2F;2；加性增：每个RTT没有丢包，窗口+1</p>
+<ul>
+<li><p>对拥塞事件做出的反应</p>
+<ul>
+<li><p>超时（更加严重</p>
+<p>CongWin立即设为1，进入慢启动，到达阈值再线性加</p>
+</li>
+<li><p>收到重复ACK</p>
+<p>CongWin减半+3（Reno版</p>
+<p>在TCP Tahoe版本里，<br>无论超时还是三个重复，都直接将CongWin 置为 1个 MSS<img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687505297360.png" alt="1687505297360"></p>
+</li>
+</ul>
+<p>总结：<img src="C:\Users\博学也呆萌\AppData\Roaming\Typora\typora-user-images\1687507353829.png" alt="1687507353829"></p>
+</li>
+</ul>
+<p>当 CongWin 低于阀值, 发送方处于慢启动阶段, 窗口指数增长.<br>当 CongWin 高于阀值, 发送方处于拥塞避免阶段, 窗口线性增长.<br>当三个重复的ACK 出现时,阀值置为CongWin&#x2F;2 并且CongWin 置为阀值加上3个MSS并进入快速恢复阶段，此时每收到一个重复的ACK拥塞窗口增加1MSS，如果收到新的ACK则拥塞窗口置成阀值）.<br>当超时发生时 ，阀值置为CongWin&#x2F;2 并且CongWin 置为1 MSS. </p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="http://example.com">见录</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2023/07/08/%E7%AC%AC%E4%B8%89%E7%AB%A0%20%E4%BC%A0%E8%BE%93%E5%B1%82/">http://example.com/2023/07/08/%E7%AC%AC%E4%B8%89%E7%AB%A0%20%E4%BC%A0%E8%BE%93%E5%B1%82/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">无糖气泡水的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%AE%A1%E7%BD%91/">计网</a></div><div class="post_share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/07/08/%E7%AC%AC%E5%9B%9B%E7%AB%A0%20%E7%BD%91%E7%BB%9C%E5%B1%82/" title="第四章 网络层"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">第四章 网络层</div></div></a></div><div class="next-post pull-right"><a href="/2023/06/06/hello-world/" title="Hello World"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Hello World</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/07/08/%E7%AC%AC%E4%B8%80%E7%AB%A0%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/" title="第一章 计算机网络和因特网"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-07-08</div><div class="title">第一章 计算机网络和因特网</div></div></a></div><div><a href="/2023/07/08/%E7%AC%AC%E4%BA%8C%E7%AB%A0%20%E5%BA%94%E7%94%A8%E5%B1%82/" title="第二层 应用层"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-07-08</div><div class="title">第二层 应用层</div></div></a></div><div><a href="/2023/07/08/%E7%AC%AC%E4%BA%94%E7%AB%A0%20%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/" title="第五章 数据链路层"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-07-08</div><div class="title">第五章 数据链路层</div></div></a></div><div><a href="/2023/07/08/%E7%AC%AC%E5%9B%9B%E7%AB%A0%20%E7%BD%91%E7%BB%9C%E5%B1%82/" title="第四章 网络层"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-07-08</div><div class="title">第四章 网络层</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">见录</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">7</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">1</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/xxxxx" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:xxxxxx@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #000000;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E7%AB%A0-%E4%BC%A0%E8%BE%93%E5%B1%82"><span class="toc-number">1.</span> <span class="toc-text">第三章 传输层</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AB%AF%E5%88%B0%E7%AB%AF-%E6%8A%A5%E6%96%87-%EF%BC%88%E8%BF%9B%E7%A8%8B%E4%B9%8B%E9%97%B4"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">端到端 报文 （进程之间</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8%E4%B8%8E%E5%88%86%E8%A7%A3"><span class="toc-number">1.0.1.</span> <span class="toc-text">3.1多路复用与分解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-UDP%EF%BC%88user-data-protocol"><span class="toc-number">1.0.2.</span> <span class="toc-text">3.2 UDP（user data protocol</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E5%8F%AF%E9%9D%A0%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86"><span class="toc-number">1.0.3.</span> <span class="toc-text">3.3 可靠数据传输原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-%E9%9D%A2%E5%90%91%E8%BF%9E%E6%8E%A5%E7%9A%84%E6%9C%8D%E5%8A%A1-TCP"><span class="toc-number">1.0.4.</span> <span class="toc-text">3.4 面向连接的服务 TCP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6%E5%8E%9F%E7%90%86"><span class="toc-number">1.0.5.</span> <span class="toc-text">3.5 拥塞控制原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-6-TCP%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6%EF%BC%81%EF%BC%81"><span class="toc-number">1.0.6.</span> <span class="toc-text">3.6 TCP拥塞控制！！</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/07/08/%E7%AC%AC%E4%B8%80%E7%AB%A0%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%92%8C%E5%9B%A0%E7%89%B9%E7%BD%91/" title="第一章 计算机网络和因特网">第一章 计算机网络和因特网</a><time datetime="2023-07-07T16:00:00.000Z" title="发表于 2023-07-08 00:00:00">2023-07-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/07/08/%E7%AC%AC%E4%BA%8C%E7%AB%A0%20%E5%BA%94%E7%94%A8%E5%B1%82/" title="第二层 应用层">第二层 应用层</a><time datetime="2023-07-07T16:00:00.000Z" title="发表于 2023-07-08 00:00:00">2023-07-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/07/08/%E7%AC%AC%E4%BA%94%E7%AB%A0%20%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/" title="第五章 数据链路层">第五章 数据链路层</a><time datetime="2023-07-07T16:00:00.000Z" title="发表于 2023-07-08 00:00:00">2023-07-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/07/08/%E7%AC%AC%E5%9B%9B%E7%AB%A0%20%E7%BD%91%E7%BB%9C%E5%B1%82/" title="第四章 网络层">第四章 网络层</a><time datetime="2023-07-07T16:00:00.000Z" title="发表于 2023-07-08 00:00:00">2023-07-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/07/08/%E7%AC%AC%E4%B8%89%E7%AB%A0%20%E4%BC%A0%E8%BE%93%E5%B1%82/" title="第三章 传输层">第三章 传输层</a><time datetime="2023-07-07T16:00:00.000Z" title="发表于 2023-07-08 00:00:00">2023-07-08</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By 见录</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
